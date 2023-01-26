@@ -1,36 +1,26 @@
 import { promises as fs } from "fs";
 
-//const fs = require("fs")
-
 class ProductManager {
 
-    constructor (path){
+    constructor (){
         this.product = new Array  
         this.path = this.crearTxt()
     }
 
-    async crearTxt (path) {
-
-        let resultado = await fs.exist("./listaProductos.txt")
-
-        if(resultado){
-
-        } else {
-            await fs.writeFile("./listaProductos.txt", JSON.stringify(this.product));
-        }
+    async crearTxt () {
+        await fs.writeFile("./listaProductos.txt", JSON.stringify(this.product));
     }
 
     
     async getProduct(){
-        let resultado = await fs.readFile("./listaProductos.txt", "utf-8");
-        console.log(resultado)
-        return JSON.parse(resultado); 
+        let leer = await fs.readFile("./listaProductos.txt", "utf-8");
+        return JSON.parse(leer); 
     }
 
     async addProduct(title, description, price, thumbnail, code, stock){
 
-        let lectura = await fs.readFile(this.path, "utf-8");
-        const arrayProductos = JSON.parse(lectura);
+        let leer = await fs.readFile("./listaProductos.txt", "utf-8");
+        const arrayProductos = JSON.parse(leer);
 
         const existeCode = arrayProductos.some(item => item.code === code);
 
@@ -39,7 +29,7 @@ class ProductManager {
         } else {
         let id = ProductManager.generarIdUnico(); 
         arrayProductos.push({title,description,price,thumbnail,code,stock,id});
-        await fs.writeFile(this.path, JSON.stringify(arrayProductos))
+        await fs.writeFile("./listaProductos.txt", JSON.stringify(arrayProductos))
         }
     }
 
@@ -52,16 +42,29 @@ class ProductManager {
         return this.incrementarId;         
     } 
 
-    getProductById(code){
-        const productoId = this.product.find(item => item.code === code);
+    async getProductById(code){
+
+        let leer = await fs.readFile("./listaProductos.txt", "utf-8");
+        const arrayProductos = JSON.parse(leer);
+
+        const productoId = arrayProductos.find(item => item.code === code);
         if(productoId){
             return productoId;
         } else {
             return "No se encontro el producto";
         }
     }
+
+    async updateProduct(id, producto){
+
+    }
+
+    async deleteProduct(id) {
+
+        let leer = await fs.readFile("./listaProductos.txt", "utf-8");
+        const arrayProductos = JSON.parse(leer);
+        const arrayFilter = arrayProductos.filter(item => item.id !== id);
+        await fs.writeFile("./listaProductos.txt", JSON.stringify(arrayFilter));
+
+    }
 }
-
-const producto1 = new ProductManager();
-
-console.log(producto1.getProduct());
