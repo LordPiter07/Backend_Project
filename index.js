@@ -65,18 +65,18 @@ class ProductManager {
     }
 
 // En base al codigo pasado por parametro, consulta el array impreso en el archivo.txt y si existe el codigo te devuelve el objeto producto.   
-    getProductById(code){
+    getProductById(id){
 
         fs.readFile("./listaProductos.txt", "utf-8", (error, data) => {
 
             if(!error){
                 const arrayProductos = (JSON.parse(data));
-                const productoId = arrayProductos.find(item => item.code === code);
+                const productoId = arrayProductos.find(item => item.id === id);
 
                 if(productoId){
                     console.log(productoId);
                 } else {
-                    console.log("No se encontro el producto") ;
+                    console.log("No se encontro el producto");
                 }
             } else{
                 console.log(`Error: ${error}`)
@@ -106,9 +106,34 @@ class ProductManager {
     }
 
 
-    updateProduct(id, ...producto){
+    updateProduct(id, {...producto}){
 
+        fs.readFile("./listaProductos.txt", "utf-8", (error, data) => {
+
+            if(!error){
+                const arrayProductos = (JSON.parse(data));
+                const arrayFind = arrayProductos.find(item => item.id === id);
+
+                if(arrayFind){
+                    let indice = arrayProductos.indexOf(arrayFind);
+                    arrayProductos[indice] = producto;
+                    arrayProductos[indice].id = id;
+
+                    fs.writeFile("./listaProductos.txt", JSON.stringify(arrayProductos), (error) => {
+                        if(error) {
+                            console.log(`Error: ${error}`)
+                        } else {
+                            console.log("Producto Modificado exitosamente!")
+                        }
+                    });
+
+                } else {
+                    console.log("No se encontro el producto");
+                }
+            } else{
+                console.log(`Error: ${error}`)
+            } 
+        });          
     }
 
 }
-
