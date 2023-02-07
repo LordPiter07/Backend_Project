@@ -1,4 +1,4 @@
-const fs = require("fs");
+import fs from 'fs';
 
 class ProductManager {
 
@@ -26,7 +26,8 @@ class ProductManager {
     getProducts(){
         fs.readFile("./listaProductos.txt", "utf-8", (error, data) => {
             if(!error){
-                console.log(JSON.parse(data))
+                //console.log(JSON.parse(data));
+                return JSON.parse(data);
             } else{
                 console.log(`Error: ${error}`)
             }
@@ -137,3 +138,6 @@ class ProductManager {
     }
 
 }
+
+export default ProductManager;
+
