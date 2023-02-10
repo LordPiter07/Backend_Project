@@ -2,12 +2,13 @@ import express, { urlencoded } from "express";
 import { ProductManager } from "./models/ProductManager.js";
 
 const app = express();
-const PUERTO = 8080;
+const PUERTO = 4000;
 
 const productManager = new ProductManager('src/models/listaProductos.txt');
 
 app.use(express.json()); //Mi app va a entender JSON.
 app.use(urlencoded({extended: true})); //Esta funcion es la que permite busquedas de URL complejas.
+
 
 //Routes
 
@@ -17,7 +18,7 @@ app.get('/', (req, res) =>{
 });
 
 //Lista de productos
-app.get("/products", async (req, res) => {
+app.get('/products', async (req, res) => {
     const { category } = req.query;
     console.log(category);
     const productos = await productManager.getProducts();

@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "nodemon src/index.js"
   },
   "repository": {
     "type": "git",
@@ -12,7 +13,6 @@
   },
   "keywords": [],
   "author": "",
-  "type": "module",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/LordPiter07/Backend_Project/issues"
