@@ -1,54 +1,35 @@
 import express, { urlencoded } from "express";
-import { ProductManager } from "./models/ProductManager.js";
+import routerProducts from './routes/products.js';
+import routerCarts from './routes/carts.js'
+import { __dirname } from "./path.js";
+import multer from "multer";
 
 const app = express();
 const PUERTO = 8080;
 
-const productManager = new ProductManager('src/models/listaProductos.txt');
+/*const imgStorage = multer.diskStorage({ destination: (req, file, cb) => {
+        cb(null, 'src/public/img')
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}${file.originalname}`);
+    }
+});
+const upload = multer({storage: imgStorage});*/
 
+//Middlewares
 app.use(express.json()); //Mi app va a entender JSON.
 app.use(urlencoded({extended: true})); //Esta funcion es la que permite busquedas de URL complejas.
 
 //Routes
+app.use('/static', express.static(__dirname + '/public'));
+app.use('/api/products', routerProducts);
+app.use('/api/carts', routerCarts)
 
-//Pagina de Inicio
-app.get('/', (req, res) =>{
-    res.send('Bienvenido! Pagina de Inicio')
-});
 
-//Lista de productos
-app.get("/products", async (req, res) => {
-    const { category } = req.query;
-    console.log(category);
-    const productos = await productManager.getProducts();
-    console.log(productos);
-    res.send(JSON.stringify(productos));
-});
-
-//Productos filtrados por ID
-app.get('/products/:id', async (req, res) =>{
-    const producto = await productManager.getProductById(req.params.id);
-    console.log(producto);
-    res.send(JSON.stringify(producto));
-});
-
-//Agregar un nuevo producto a la lista
-app.post('/products', async (req, res) => {
-    let msj = await productManager.addProducts(req.body);
-    res.send(msj);
-})
-
-//Borrar un producto de la lista
-app.delete('/products/:id', async (req, res) => {
-    let msj = await productManager.deleteProduct(req.params.id);
-    res.send(msj);
-})
-
-//actualizar un producto de la lista
-app.put('/products/:id', async (req, res) => {
-    let msj = await productManager.updateProduct(req.params.id, req.body);
-    res.send(msj);
-})
+/*app.post('/upload', upload.single('product'), (req,res) =>{
+    console.log(req.file);
+    res.send("Se cargo la imagen de manera exitosa");
+})*/
 
 
 app.listen(PUERTO, () =>{
