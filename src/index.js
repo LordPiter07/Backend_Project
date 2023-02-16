@@ -1,37 +1,48 @@
 import express, { urlencoded } from "express";
-import routerProducts from './routes/products.js';
-import routerCarts from './routes/carts.js'
+import routerProducts from "./routes/products.js";
+import routerCarts from "./routes/carts.js";
 import { __dirname } from "./path.js";
-import multer from "multer";
+import { engine } from "express-handlebars";
+import * as path from "path";
+import { ProductManager } from "../src/controllers/ProductManager.js";
+import { Server } from "socket.io";
 
 const app = express();
 const PUERTO = 8080;
+const productManager = new ProductManager('src/models/productos.json');
 
-/*const imgStorage = multer.diskStorage({ destination: (req, file, cb) => {
-        cb(null, 'src/public/img')
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}${file.originalname}`);
-    }
-});
-const upload = multer({storage: imgStorage});*/
+const server = app.listen(PUERTO, () =>{
+    console.log(`Server On Port ${PUERTO}`);
+})
+const io = new Server(server);
+
 
 //Middlewares
 app.use(express.json()); //Mi app va a entender JSON.
 app.use(urlencoded({extended: true})); //Esta funcion es la que permite busquedas de URL complejas.
+app.engine('handlebars', engine());
+app.set('view engine', 'handlebars');
+app.set("views", path.resolve(__dirname, './views'));
 
 //Routes
-app.use('/static', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/public'));
 app.use('/api/products', routerProducts);
-app.use('/api/carts', routerCarts)
+app.use('/api/carts', routerCarts);
 
 
-/*app.post('/upload', upload.single('product'), (req,res) =>{
-    console.log(req.file);
-    res.send("Se cargo la imagen de manera exitosa");
-})*/
+io.on("connection", (socket) =>{
+    console.log("Cliente conectado");
+    socket.on('mensaje', info=>{
+        console.log(info);
+    })
+
+    socket.emit('evento-admin', "desde server ADMIN")
+})
 
 
-app.listen(PUERTO, () =>{
-    console.log(`Server On Port ${PUERTO}`)
-});
+app.get('/', async (req, res) => {
+    const productos = await productManager.getProducts();
+    res.render("home", {titulo: "E-commerce", productos});
+})
+
+
